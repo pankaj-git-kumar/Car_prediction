@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-import models, schemas
-
+from . import models
+from app.db.schemas import UserCreate
 def get_all_users(db: Session):
     return db.query(models.User).all()
 
@@ -20,7 +20,17 @@ def get_employee_email(db: Session, email: str):
         .first()
     )
 
-def create_employee(db: Session, user: schemas.EmployeeCreate):
+
+def authenticate_user(db: Session, email: str, password: str):
+    user = get_employee_email(db, email)
+    if not user:
+        return False
+    if not user.password == password:
+        return False
+    return user
+
+
+def create_user(db: Session, user: UserCreate):
     new_user = models.User(
         name=user.name,
         email=user.email,
